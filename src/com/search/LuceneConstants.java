@@ -42,7 +42,7 @@ public class LuceneConstants {
             IndexSearcher searcher = new IndexSearcher(reader);
             TermQuery tq = new TermQuery(new Term(field, text));
             TopDocs results = searcher.search(tq, 20);
-            System.out.println("Match found in " + results.scoreDocs.length + " documents");
+            System.out.println("Match found in " + results.scoreDocs.length + " document/s");
 
             //print details of the matched documents
             for(ScoreDoc scoreDoc: results.scoreDocs){
