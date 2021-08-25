@@ -2,10 +2,7 @@ package com.search;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.*;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -17,6 +14,8 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -24,10 +23,12 @@ import java.nio.file.Path;
 public class LuceneConstants {
     public static void main(String[] args) {
         try {
-            Path indexPath = FileSystems.getDefault().getPath("D:\\Projects\\Java Projects\\index");
+            Path indexPath = FileSystems.getDefault().getPath("D:\\Projects\\Java Projects\\index for documents");
             Directory dir = FSDirectory.open(indexPath);
-            writeDoc(dir);
-            searchDoc(dir, "content", "there");
+            File file = new File("D:\\Study Materials\\IntelliJ shortcuts.txt");
+            writeDocFromFile(dir, file);
+            //writeDoc(dir);
+            searchDoc(dir, "content", "commit");
         } catch (IOException ex) {
             ex.getStackTrace();
         }
@@ -62,6 +63,39 @@ public class LuceneConstants {
             doc.add(new StringField("students", "trust fund baby", Field.Store.YES));
             writer.addDocument(doc);
             writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeDocFromFile(Directory dir, File file){
+        try {
+            Analyzer analyzer = new StandardAnalyzer();
+            IndexWriterConfig icw = new IndexWriterConfig(analyzer);
+            IndexWriter writer = new IndexWriter(dir, icw);
+
+            Document document = new Document();
+
+            //index file contents
+            Field contentField = new TextField("content",
+                    new FileReader(file));
+
+            //index file name
+            Field fileNameField = new StringField("File Name",
+                    file.getName(),
+                    Field.Store.YES);
+
+            //index file path
+            Field filePathField = new StringField("File Path",
+                    file.getCanonicalPath(), Field.Store.YES);
+
+            document.add(contentField);
+            document.add(fileNameField);
+            document.add(filePathField);
+
+            writer.addDocument(document);
+            writer.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
